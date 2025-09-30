@@ -1,0 +1,24 @@
+INFO:__main__:Diretório de uploads criado: static/uploads
+INFO:__main__:Dados carregados com sucesso: 0 homenagens
+🚀 Servidor iniciado em http://45.70.136.66:5000
+🔧 Admin: http://45.70.136.66:5000/admin
+ * Serving Flask app 'app'
+ * Debug mode: off
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.18.59.101:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:__main__:Dados carregados com sucesso: 0 homenagens
+INFO:werkzeug:127.0.0.1 - - [29/Sep/2025 23:17:17] "GET /api/health HTTP/1.1" 200 -
+INFO:werkzeug:172.18.48.1 - - [29/Sep/2025 23:17:26] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:172.18.48.1 - - [29/Sep/2025 23:17:26] "GET /static/css/style.css HTTP/1.1" 200 -
+INFO:werkzeug:172.18.48.1 - - [29/Sep/2025 23:17:26] "GET /static/js/main.js HTTP/1.1" 200 -
+INFO:__main__:Dados carregados com sucesso: 0 homenagens
+INFO:werkzeug:172.18.48.1 - - [29/Sep/2025 23:17:26] "GET /api/tributes HTTP/1.1" 200 -
+INFO:werkzeug:172.18.48.1 - - [29/Sep/2025 23:17:27] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:werkzeug:172.18.48.1 - - [29/Sep/2025 23:18:56] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:172.18.48.1 - - [29/Sep/2025 23:18:56] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:172.18.48.1 - - [29/Sep/2025 23:18:56] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+INFO:__main__:Dados carregados com sucesso: 0 homenagens
+INFO:werkzeug:172.18.48.1 - - [29/Sep/2025 23:18:56] "GET /api/tributes HTTP/1.1" 200 -

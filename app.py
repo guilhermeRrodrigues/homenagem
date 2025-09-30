@@ -258,4 +258,6 @@ def debug_info():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('FLASK_ENV') == 'development'
+    print(f"🚀 Servidor iniciado em http://45.70.136.66:{port}")
+    print(f"🔧 Admin: http://45.70.136.66:{port}/admin")
     app.run(host='0.0.0.0', port=port, debug=debug)
