@@ -1,10 +1,15 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 import os
 import json
+import logging
 from datetime import datetime
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+
+# Configurar logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Configuração da aplicação
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
@@ -13,6 +18,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # Criar diretório de uploads se não existir
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+logger.info(f"Diretório de uploads criado: {app.config['UPLOAD_FOLDER']}")
 
 # Extensões permitidas para imagens
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
@@ -29,6 +35,7 @@ def load_tributes_data():
         if os.path.exists(DATA_FILE):
             with open(DATA_FILE, 'r', encoding='utf-8') as f:
                 data = json.load(f)
+                logger.info(f"Dados carregados com sucesso: {len(data.get('messages', []))} homenagens")
                 return data
         else:
             # Criar arquivo inicial se não existir
@@ -37,9 +44,10 @@ def load_tributes_data():
                 'current_index': 0
             }
             save_tributes_data(initial_data)
+            logger.info("Arquivo de dados inicial criado")
             return initial_data
     except Exception as e:
-        print(f"Erro ao carregar dados: {e}")
+        logger.error(f"Erro ao carregar dados: {e}")
         return {
             'messages': [],
             'current_index': 0
@@ -50,9 +58,10 @@ def save_tributes_data(data):
     try:
         with open(DATA_FILE, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
+        logger.info(f"Dados salvos com sucesso: {len(data.get('messages', []))} homenagens")
         return True
     except Exception as e:
-        print(f"Erro ao salvar dados: {e}")
+        logger.error(f"Erro ao salvar dados: {e}")
         return False
 
 # Carregar dados iniciais
@@ -187,19 +196,64 @@ def upload_file():
 @app.route('/api/health')
 def health_check():
     """Endpoint de verificação de saúde da aplicação"""
-    return jsonify({
-        'status': 'healthy',
-        'message': 'Aplicação Flask funcionando corretamente'
-    })
+    try:
+        # Verificar se consegue carregar dados
+        data = load_tributes_data()
+        return jsonify({
+            'status': 'healthy',
+            'message': 'Aplicação Flask funcionando corretamente',
+            'tributes_count': len(data.get('messages', [])),
+            'data_file_exists': os.path.exists(DATA_FILE),
+            'upload_folder_exists': os.path.exists(app.config['UPLOAD_FOLDER'])
+        })
+    except Exception as e:
+        logger.error(f"Erro no health check: {e}")
+        return jsonify({
+            'status': 'unhealthy',
+            'message': f'Erro na aplicação: {str(e)}'
+        }), 500
 
 @app.route('/api/info')
 def app_info():
     """Informações da aplicação"""
     return jsonify({
-        'app_name': 'Site de Homenagens',
+        'app_name': 'Homenagens 7º ano',
         'version': '1.0.0',
-        'environment': os.environ.get('FLASK_ENV', 'development')
+        'environment': os.environ.get('FLASK_ENV', 'development'),
+        'port': os.environ.get('PORT', 5000),
+        'host': '0.0.0.0'
     })
+
+@app.route('/api/debug')
+def debug_info():
+    """Informações de debug para diagnóstico"""
+    try:
+        data = load_tributes_data()
+        return jsonify({
+            'status': 'ok',
+            'data_file': DATA_FILE,
+            'data_file_exists': os.path.exists(DATA_FILE),
+            'data_file_readable': os.access(DATA_FILE, os.R_OK) if os.path.exists(DATA_FILE) else False,
+            'data_file_writable': os.access(os.path.dirname(DATA_FILE), os.W_OK),
+            'upload_folder': app.config['UPLOAD_FOLDER'],
+            'upload_folder_exists': os.path.exists(app.config['UPLOAD_FOLDER']),
+            'upload_folder_writable': os.access(app.config['UPLOAD_FOLDER'], os.W_OK),
+            'tributes_count': len(data.get('messages', [])),
+            'current_index': data.get('current_index', 0),
+            'working_directory': os.getcwd(),
+            'environment_vars': {
+                'FLASK_ENV': os.environ.get('FLASK_ENV'),
+                'PORT': os.environ.get('PORT'),
+                'SECRET_KEY': '***' if os.environ.get('SECRET_KEY') else 'Not set'
+            }
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'error': str(e),
+            'data_file': DATA_FILE,
+            'working_directory': os.getcwd()
+        }), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

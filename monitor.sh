@@ -1,241 +1,134 @@
 #!/bin/bash
 
-# Script de Monitoramento - Site de Homenagens 7º Ano
-# Execute com: bash monitor.sh
+# ==========================================
+# Script de Monitoramento - Site de Homenagens
+# ==========================================
 
-# Cores
+# Cores para output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m'
+NC='\033[0m' # No Color
 
-print_header() {
-    echo -e "${BLUE}================================${NC}"
-    echo -e "${BLUE}  Monitor do Site de Homenagens  ${NC}"
-    echo -e "${BLUE}================================${NC}"
-}
+echo -e "${BLUE}=========================================="
+echo "📊 Monitoramento - Site de Homenagens"
+echo "==========================================${NC}"
 
-print_status() {
-    echo -e "${BLUE}[$(date '+%Y-%m-%d %H:%M:%S')]${NC} $1"
-}
-
-print_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
-}
-
-print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
-}
-
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-# Verificar se Docker está rodando
-check_docker() {
-    if ! systemctl is-active --quiet docker; then
-        print_error "Docker não está rodando!"
-        return 1
-    fi
-    return 0
-}
-
-# Verificar status dos containers
-check_containers() {
-    print_status "Verificando containers..."
+# Função para verificar status
+check_status() {
+    local service=$1
+    local description=$2
     
-    if docker-compose ps | grep -q "Up"; then
-        print_success "Containers estão rodando"
-        docker-compose ps
+    if systemctl is-active --quiet $service; then
+        echo -e "${GREEN}✓ $description${NC}"
+        return 0
     else
-        print_error "Alguns containers não estão rodando!"
-        docker-compose ps
+        echo -e "${RED}✗ $description${NC}"
         return 1
     fi
 }
 
-# Verificar uso de recursos
-check_resources() {
-    print_status "Verificando uso de recursos..."
-    
-    echo "=== Uso de Memória ==="
-    free -h
-    
-    echo -e "\n=== Uso de Disco ==="
-    df -h
-    
-    echo -e "\n=== Uso de CPU e Memória dos Containers ==="
-    docker stats --no-stream
-}
+# 1. Status dos containers
+echo -e "\n${BLUE}=== STATUS DOS CONTAINERS ===${NC}"
+docker-compose ps
 
-# Verificar logs de erro
-check_logs() {
-    print_status "Verificando logs de erro..."
-    
-    if docker-compose logs --tail=50 web | grep -i error; then
-        print_warning "Encontrados erros nos logs"
-    else
-        print_success "Nenhum erro encontrado nos logs recentes"
-    fi
-}
+# 2. Status dos serviços
+echo -e "\n${BLUE}=== STATUS DOS SERVIÇOS ===${NC}"
+check_status "docker.service" "Docker Service"
+check_status "omenagem.service" "Aplicação (Systemd)"
 
-# Verificar conectividade
-check_connectivity() {
-    print_status "Verificando conectividade..."
-    
-    if curl -s -f http://localhost:5000/api/health > /dev/null; then
-        print_success "API está respondendo"
-    else
-        print_error "API não está respondendo!"
-        return 1
-    fi
-}
+# 3. Verificação de portas
+echo -e "\n${BLUE}=== PORTAS EM USO ===${NC}"
+ss -tulpn | grep -E ":(80|8080|5000)" | while read line; do
+    echo -e "${GREEN}✓ $line${NC}"
+done
 
-# Verificar arquivo de dados
-check_data_file() {
-    print_status "Verificando arquivo de dados..."
+# 4. Health check da aplicação
+echo -e "\n${BLUE}=== HEALTH CHECK ===${NC}"
+if curl -s http://localhost:8080/api/health > /dev/null; then
+    echo -e "${GREEN}✓ Aplicação respondendo${NC}"
     
-    if [ -f "/tmp/tributes_data.json" ]; then
-        print_success "Arquivo de dados existe"
-        
-        # Verificar se é um JSON válido
-        if python3 -m json.tool /tmp/tributes_data.json > /dev/null 2>&1; then
-            print_success "Arquivo de dados é um JSON válido"
-            
-            # Contar homenagens
-            count=$(python3 -c "import json; data=json.load(open('/tmp/tributes_data.json')); print(len(data['messages']))")
-            print_status "Número de homenagens: $count"
-        else
-            print_error "Arquivo de dados não é um JSON válido!"
-        fi
-    else
-        print_warning "Arquivo de dados não existe"
-    fi
-}
-
-# Verificar espaço em disco
-check_disk_space() {
-    print_status "Verificando espaço em disco..."
-    
-    usage=$(df / | awk 'NR==2 {print $5}' | sed 's/%//')
-    
-    if [ "$usage" -gt 90 ]; then
-        print_error "Espaço em disco crítico: ${usage}% usado"
-    elif [ "$usage" -gt 80 ]; then
-        print_warning "Espaço em disco baixo: ${usage}% usado"
-    else
-        print_success "Espaço em disco OK: ${usage}% usado"
-    fi
-}
-
-# Verificar portas
-check_ports() {
-    print_status "Verificando portas..."
-    
-    if netstat -tuln | grep -q ":80 "; then
-        print_success "Porta 80 está em uso"
-    else
-        print_warning "Porta 80 não está em uso"
-    fi
-    
-    if netstat -tuln | grep -q ":5000 "; then
-        print_success "Porta 5000 está em uso"
-    else
-        print_warning "Porta 5000 não está em uso"
-    fi
-}
-
-# Fazer backup automático se necessário
-auto_backup() {
-    print_status "Verificando necessidade de backup..."
-    
-    # Fazer backup se o arquivo foi modificado nas últimas 24h
-    if [ -f "/tmp/tributes_data.json" ]; then
-        if find /tmp/tributes_data.json -mtime -1 | grep -q .; then
-            print_status "Fazendo backup automático..."
-            ./backup.sh
-        else
-            print_status "Arquivo não foi modificado recentemente, backup não necessário"
-        fi
-    fi
-}
-
-# Reiniciar se necessário
-auto_restart() {
-    print_status "Verificando se reinicialização é necessária..."
-    
-    # Verificar se a API está respondendo
-    if ! curl -s -f http://localhost:5000/api/health > /dev/null; then
-        print_warning "API não está respondendo, tentando reiniciar..."
-        docker-compose restart web
-        sleep 10
-        
-        if curl -s -f http://localhost:5000/api/health > /dev/null; then
-            print_success "Reinicialização bem-sucedida"
-        else
-            print_error "Falha na reinicialização"
-        fi
-    else
-        print_success "API está funcionando normalmente"
-    fi
-}
-
-# Relatório completo
-full_report() {
-    print_header
-    check_docker
-    check_containers
-    check_resources
-    check_logs
-    check_connectivity
-    check_data_file
-    check_disk_space
-    check_ports
-    auto_backup
-    auto_restart
-    echo -e "${BLUE}================================${NC}"
-}
-
-# Menu interativo
-interactive_menu() {
-    while true; do
-        echo -e "\n${BLUE}Menu de Monitoramento:${NC}"
-        echo "1. Status dos containers"
-        echo "2. Uso de recursos"
-        echo "3. Ver logs"
-        echo "4. Testar conectividade"
-        echo "5. Verificar arquivo de dados"
-        echo "6. Relatório completo"
-        echo "7. Fazer backup"
-        echo "8. Reiniciar aplicação"
-        echo "9. Sair"
-        
-        read -p "Escolha uma opção (1-9): " choice
-        
-        case $choice in
-            1) check_containers ;;
-            2) check_resources ;;
-            3) docker-compose logs -f web ;;
-            4) check_connectivity ;;
-            5) check_data_file ;;
-            6) full_report ;;
-            7) ./backup.sh ;;
-            8) docker-compose restart ;;
-            9) echo "Saindo..."; exit 0 ;;
-            *) echo "Opção inválida" ;;
-        esac
-    done
-}
-
-# Verificar argumentos
-if [ "$1" = "interactive" ] || [ "$1" = "-i" ]; then
-    interactive_menu
-elif [ "$1" = "report" ] || [ "$1" = "-r" ]; then
-    full_report
+    # Mostrar informações detalhadas
+    echo -e "\n${YELLOW}Informações da aplicação:${NC}"
+    curl -s http://localhost:8080/api/health | python3 -m json.tool 2>/dev/null || curl -s http://localhost:8080/api/health
 else
-    echo "Uso: $0 {interactive|report}"
-    echo "  interactive, -i: Menu interativo"
-    echo "  report, -r: Relatório completo"
-    exit 1
+    echo -e "${RED}✗ Aplicação não está respondendo${NC}"
 fi
+
+# 5. Uso de recursos
+echo -e "\n${BLUE}=== USO DE RECURSOS ===${NC}"
+echo -e "${YELLOW}Containers:${NC}"
+docker stats --no-stream --format "table {{.Container}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}"
+
+# 6. Espaço em disco
+echo -e "\n${YELLOW}Espaço em disco:${NC}"
+df -h / | tail -1 | awk '{print "Uso: " $5 " (" $3 "/" $2 ")"}'
+
+# 7. Verificação de arquivos importantes
+echo -e "\n${BLUE}=== ARQUIVOS IMPORTANTES ===${NC}"
+if [ -f "/tmp/tributes_data.json" ]; then
+    echo -e "${GREEN}✓ Arquivo de dados existe${NC}"
+    tribute_count=$(cat /tmp/tributes_data.json | grep -o '"id"' | wc -l)
+    echo -e "  • Homenagens: ${YELLOW}$tribute_count${NC}"
+else
+    echo -e "${RED}✗ Arquivo de dados não encontrado${NC}"
+fi
+
+if [ -d "static/uploads" ]; then
+    echo -e "${GREEN}✓ Diretório de uploads existe${NC}"
+    upload_count=$(find static/uploads -type f | wc -l)
+    echo -e "  • Imagens: ${YELLOW}$upload_count${NC}"
+else
+    echo -e "${RED}✗ Diretório de uploads não encontrado${NC}"
+fi
+
+# 8. Logs recentes
+echo -e "\n${BLUE}=== LOGS RECENTES ===${NC}"
+echo -e "${YELLOW}Últimas 5 linhas dos logs da aplicação:${NC}"
+docker-compose logs --tail=5 web
+
+# 9. Status do firewall
+echo -e "\n${BLUE}=== FIREWALL ===${NC}"
+sudo ufw status | grep -E "(8080|80|443)" | while read line; do
+    echo -e "${GREEN}✓ $line${NC}"
+done
+
+# 10. Conectividade externa
+echo -e "\n${BLUE}=== CONECTIVIDADE EXTERNA ===${NC}"
+if timeout 5 curl -s http://45.70.136.66:8080/api/health > /dev/null 2>&1; then
+    echo -e "${GREEN}✓ Acesso externo funcionando${NC}"
+else
+    echo -e "${YELLOW}⚠ Acesso externo pode não estar funcionando${NC}"
+fi
+
+# 11. Resumo
+echo -e "\n${BLUE}=========================================="
+echo "📋 RESUMO"
+echo "==========================================${NC}"
+
+# Contar problemas
+problems=0
+
+if ! docker-compose ps | grep -q "Up"; then
+    ((problems++))
+fi
+
+if ! curl -s http://localhost:8080/api/health > /dev/null; then
+    ((problems++))
+fi
+
+if [ $problems -eq 0 ]; then
+    echo -e "${GREEN}🎉 Tudo funcionando perfeitamente!${NC}"
+    echo -e "\n${BLUE}URLs de acesso:${NC}"
+    echo -e "  • Site: ${YELLOW}http://45.70.136.66:8080${NC}"
+    echo -e "  • Admin: ${YELLOW}http://45.70.136.66:8080/admin${NC}"
+else
+    echo -e "${RED}⚠ $problems problema(s) detectado(s)${NC}"
+    echo -e "\n${YELLOW}Comandos para diagnóstico:${NC}"
+    echo -e "  • Ver logs: ${YELLOW}docker-compose logs -f web${NC}"
+    echo -e "  • Reiniciar: ${YELLOW}docker-compose restart${NC}"
+    echo -e "  • Teste completo: ${YELLOW}./test-deploy.sh${NC}"
+fi
+
+echo -e "\n${BLUE}==========================================${NC}"

@@ -21,13 +21,18 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copiar código da aplicação
 COPY . .
 
-# Criar diretório de uploads se não existir
-RUN mkdir -p /app/static/uploads
+# Criar diretório de uploads e tmp se não existirem
+RUN mkdir -p /app/static/uploads /tmp
 
 # Criar usuário não-root para segurança
-RUN adduser --disabled-password --gecos '' appuser && chown -R appuser:appuser /app
-# Dar permissão de escrita para o diretório de uploads
+RUN adduser --disabled-password --gecos '' appuser
+
+# Dar permissões corretas
+RUN chown -R appuser:appuser /app
 RUN chmod -R 755 /app/static/uploads
+RUN chmod 755 /tmp
+
+# Mudar para usuário não-root
 USER appuser
 
 # Expor porta
