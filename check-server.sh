@@ -5,7 +5,7 @@
 
 echo "🔍 Verificando configuração do servidor..."
 echo "📍 IP: 45.70.136.66"
-echo "📍 Porta: 80"
+echo "📍 Porta: 8080"
 echo "-" * 50
 
 # Verificar se o Docker está rodando
@@ -20,15 +20,15 @@ if ! docker-compose ps | grep -q "omenagem-app.*Up"; then
     exit 1
 fi
 
-# Verificar se a porta 80 está sendo usada pelo container
-if ! docker-compose ps | grep -q "45.70.136.66:80->3000/tcp"; then
-    echo "❌ Porta 80 não está mapeada corretamente"
+# Verificar se a porta 8080 está sendo usada pelo container
+if ! docker-compose ps | grep -q "45.70.136.66:8080->3000/tcp"; then
+    echo "❌ Porta 8080 não está mapeada corretamente"
     exit 1
 fi
 
 # Verificar se a aplicação responde localmente
 echo "⏳ Testando aplicação localmente..."
-if curl -f http://45.70.136.66/api/health > /dev/null 2>&1; then
+if curl -f http://45.70.136.66:8080/api/health > /dev/null 2>&1; then
     echo "✅ Aplicação respondendo localmente"
 else
     echo "❌ Aplicação não responde localmente"
@@ -38,11 +38,11 @@ fi
 # Verificar firewall
 echo "⏳ Verificando firewall..."
 if command -v ufw > /dev/null 2>&1; then
-    if ufw status | grep -q "80/tcp.*ALLOW"; then
-        echo "✅ Porta 80 liberada no UFW"
+    if ufw status | grep -q "8080/tcp.*ALLOW"; then
+        echo "✅ Porta 8080 liberada no UFW"
     else
-        echo "⚠️  Porta 80 pode não estar liberada no UFW"
-        echo "   Execute: sudo ufw allow 80/tcp"
+        echo "⚠️  Porta 8080 pode não estar liberada no UFW"
+        echo "   Execute: sudo ufw allow 8080/tcp"
     fi
 else
     echo "⚠️  UFW não encontrado, verifique iptables manualmente"
@@ -59,8 +59,8 @@ fi
 
 echo ""
 echo "🌐 URLs de acesso:"
-echo "   Aplicação: http://45.70.136.66"
-echo "   Admin: http://45.70.136.66/admin"
-echo "   API Health: http://45.70.136.66/api/health"
+echo "   Aplicação: http://45.70.136.66:8080"
+echo "   Admin: http://45.70.136.66:8080/admin"
+echo "   API Health: http://45.70.136.66:8080/api/health"
 echo ""
 echo "✅ Servidor configurado para acesso externo!"

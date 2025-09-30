@@ -8,7 +8,7 @@ Aplicação de homenagens containerizada para Ubuntu Server 24.04.2 LTS.
 - Docker 20.10+
 - Docker Compose 1.29+
 - IP do servidor: 45.70.136.66
-- Porta 80 liberada no firewall
+- Porta 8080 liberada no firewall
 
 ## 🚀 Inicialização Rápida
 
@@ -31,10 +31,10 @@ docker-compose ps
 
 ## 🌐 Acesso
 
-- **Aplicação**: http://45.70.136.66
-- **Admin**: http://45.70.136.66/admin
-- **API Health**: http://45.70.136.66/api/health
-- **API Info**: http://45.70.136.66/api/info
+- **Aplicação**: http://45.70.136.66:8080
+- **Admin**: http://45.70.136.66:8080/admin
+- **API Health**: http://45.70.136.66:8080/api/health
+- **API Info**: http://45.70.136.66:8080/api/info
 
 ## 🔧 Comandos Úteis
 
@@ -52,7 +52,7 @@ docker-compose up --build -d
 docker-compose exec omenagem-app bash
 
 # Verificar saúde
-curl http://45.70.136.66/api/health
+curl http://45.70.136.66:8080/api/health
 ```
 
 ## 📁 Estrutura de Volumes
@@ -70,14 +70,14 @@ curl http://45.70.136.66/api/health
 ## 🔥 Configuração de Firewall
 
 ```bash
-# Liberar porta 80 no UFW
-sudo ufw allow 80/tcp
+# Liberar porta 8080 no UFW
+sudo ufw allow 8080/tcp
 
 # Verificar status do firewall
 sudo ufw status
 
-# Se necessário, liberar porta 80 no iptables
-sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+# Se necessário, liberar porta 8080 no iptables
+sudo iptables -A INPUT -p tcp --dport 8080 -j ACCEPT
 ```
 
 ## 🐛 Troubleshooting
@@ -87,8 +87,8 @@ sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
 # Verificar logs
 docker-compose logs
 
-# Verificar se a porta 80 está livre
-sudo netstat -tlnp | grep :80
+# Verificar se a porta 8080 está livre
+sudo netstat -tlnp | grep :8080
 
 # Verificar se o IP está configurado corretamente
 docker-compose ps
@@ -96,14 +96,14 @@ docker-compose ps
 
 ### Acesso externo não funciona
 ```bash
-# Verificar se a porta 80 está aberta externamente
-telnet 45.70.136.66 80
+# Verificar se a porta 8080 está aberta externamente
+telnet 45.70.136.66 8080
 
 # Verificar configuração de rede
 ip addr show
 
 # Verificar se o Docker está escutando no IP correto
-sudo netstat -tlnp | grep :80
+sudo netstat -tlnp | grep :8080
 ```
 
 ### Problemas de permissão
