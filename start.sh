@@ -4,8 +4,8 @@
 # Compatível com Ubuntu Server 24.04.2 LTS
 
 echo "🚀 Iniciando aplicação Omenagem..."
-echo "📍 URL: http://localhost"
-echo "📍 Admin: http://localhost/admin"
+echo "📍 URL: http://45.70.136.66"
+echo "📍 Admin: http://45.70.136.66/admin"
 echo "⏹️  Para parar: Ctrl+C ou 'docker-compose down'"
 echo "-" * 50
 
@@ -40,11 +40,11 @@ echo "⏳ Aguardando aplicação inicializar..."
 sleep 10
 
 # Verificar saúde da aplicação
-if curl -f http://localhost/api/health > /dev/null 2>&1; then
+if curl -f http://45.70.136.66/api/health > /dev/null 2>&1; then
     echo "✅ Aplicação iniciada com sucesso!"
-    echo "🌐 Acesse: http://localhost"
-    echo "🔧 Admin: http://localhost/admin"
-    echo "📊 Status: http://localhost/api/health"
+    echo "🌐 Acesse: http://45.70.136.66"
+    echo "🔧 Admin: http://45.70.136.66/admin"
+    echo "📊 Status: http://45.70.136.66/api/health"
 else
     echo "❌ Erro ao iniciar aplicação. Verifique os logs:"
     echo "docker-compose logs"
