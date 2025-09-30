@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Início - Flask Docker App{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="jumbotron bg-primary text-white p-5 rounded mb-4">
+            <h1 class="display-4">Bem-vindo ao Flask Docker App!</h1>
+            <p class="lead">Uma aplicação Flask moderna containerizada com Docker.</p>
+            <hr class="my-4">
+            <p>Esta aplicação demonstra como integrar Flask com Docker e Docker Compose.</p>
+            <a class="btn btn-light btn-lg" href="{{ url_for('about') }}" role="button">Saiba mais</a>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">🚀 Tecnologias</h5>
+                        <p class="card-text">
+                            <ul class="list-unstyled">
+                                <li>✅ Python Flask</li>
+                                <li>✅ Docker</li>
+                                <li>✅ Docker Compose</li>
+                                <li>✅ Bootstrap 5</li>
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">🔧 Recursos</h5>
+                        <p class="card-text">
+                            <ul class="list-unstyled">
+                                <li>✅ API REST</li>
+                                <li>✅ Templates HTML</li>
+                                <li>✅ Responsive Design</li>
+                                <li>✅ Health Check</li>
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">📊 Status da Aplicação</h5>
+            </div>
+            <div class="card-body">
+                <div id="app-status" class="alert alert-info">
+                    <i class="fas fa-spinner fa-spin"></i> Verificando status...
+                </div>
+                <button class="btn btn-primary" onclick="checkAppStatus()">Verificar Status</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

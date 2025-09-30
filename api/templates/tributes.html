@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Homenagens - Site de Homenagens{% endblock %}
+
+{% block content %}
+<div class="tributes-container">
+    <!-- Header com título principal -->
+    <div class="tributes-header">
+        <h1 class="main-title">
+            <span class="heart-icon">💝</span>
+            Homenagens Especiais
+            <span class="heart-icon">💝</span>
+        </h1>
+        <p class="subtitle">Mensagens carinhosas de quem te ama</p>
+    </div>
+
+    <!-- Card principal da homenagem -->
+    <div class="tribute-card-container">
+        <div class="tribute-card" id="tributeCard">
+            <div class="tribute-content">
+                <div class="tribute-image-container" id="imageContainer" style="display: none;">
+                    <img id="tributeImage" src="" alt="Imagem da homenagem" class="tribute-image">
+                </div>
+                
+                <div class="tribute-message-container">
+                    <div class="message-text" id="messageText">
+                        Carregando homenagens...
+                    </div>
+                    <div class="message-author" id="messageAuthor">
+                        <span class="author-label">De:</span>
+                        <span class="author-name">-</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tribute-navigation">
+                <button class="nav-btn prev-btn" id="prevBtn" onclick="previousTribute()">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                
+                <div class="tribute-counter">
+                    <span id="currentIndex">1</span>
+                    <span class="separator">/</span>
+                    <span id="totalCount">0</span>
+                </div>
+                
+                <button class="nav-btn next-btn" id="nextBtn" onclick="nextTribute()">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Indicador de carregamento -->
+    <div class="loading-indicator" id="loadingIndicator">
+        <div class="loading-spinner"></div>
+        <p>Carregando homenagens...</p>
+    </div>
+
+    <!-- Mensagem quando não há homenagens -->
+    <div class="no-tributes" id="noTributes" style="display: none;">
+        <div class="no-tributes-content">
+            <i class="fas fa-heart-broken"></i>
+            <h3>Nenhuma homenagem disponível</h3>
+            <p>As homenagens aparecerão aqui quando forem adicionadas.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Efeitos de partículas flutuantes -->
+<div class="floating-hearts">
+    <div class="heart heart-1">💖</div>
+    <div class="heart heart-2">💕</div>
+    <div class="heart heart-3">💗</div>
+    <div class="heart heart-4">💝</div>
+    <div class="heart heart-5">💞</div>
+</div>
+{% endblock %}

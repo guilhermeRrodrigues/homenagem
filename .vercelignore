@@ -1,0 +1,26 @@
+# Ignorar arquivos desnecessários no Vercel
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.env
+*.log
+.git/
+.gitignore
+README.md
+DOCKER.md
+PORTA-80.md
+README-ESCOLA.md
+Dockerfile
+docker-compose.yml
+.dockerignore
+start*.sh
+stop.sh
+check-server.sh
+instalar-escola.sh
+data/
+*.json
