@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Script para fazer upload dos arquivos para o servidor
-# Execute no seu computador local: bash upload-to-server.sh
+# Script simples para fazer upload dos arquivos para o servidor
+# Execute no seu computador local: bash upload-simple.sh
 
 set -e
 
@@ -44,7 +44,6 @@ print_header
 # Verificar se o diretório local existe
 if [ ! -d "$LOCAL_DIR" ]; then
     print_error "Diretório local não encontrado: $LOCAL_DIR"
-    print_status "Execute este script do diretório correto ou ajuste a variável LOCAL_DIR"
     exit 1
 fi
 
@@ -77,9 +76,12 @@ scp $LOCAL_DIR/deploy-producao.sh $SERVER:$REMOTE_DIR/
 
 print_success "Upload concluído!"
 
-print_status "Conectando ao servidor para executar o deploy..."
-ssh $SERVER "cd $REMOTE_DIR && chmod +x deploy-producao.sh && bash deploy-producao.sh"
-
-print_success "🎉 Deploy concluído!"
+print_warning "Próximos passos:"
+echo "1. Conecte ao servidor: ssh $SERVER"
+echo "2. Execute: cd $REMOTE_DIR"
+echo "3. Execute: chmod +x deploy-producao.sh"
+echo "4. Execute: bash deploy-producao.sh"
+echo "5. Execute: ./manage.sh start"
+echo ""
 print_status "Acesse: http://45.70.136.66"
 print_status "Administração: http://45.70.136.66/admin"
