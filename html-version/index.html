@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homenagens 7º Ano</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-heart"></i> Homenagens 7º Ano</h1>
+            <p>Mensagens de carinho e gratidão</p>
+        </header>
+
+        <main class="main-content">
+            <!-- Loading Indicator -->
+            <div id="loadingIndicator" class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Carregando homenagens...</p>
+            </div>
+
+            <!-- No Tributes Message -->
+            <div id="noTributes" class="no-tributes" style="display: none;">
+                <i class="fas fa-heart-broken"></i>
+                <h2>Nenhuma homenagem disponível</h2>
+                <p>Ainda não há mensagens de homenagem cadastradas.</p>
+                <a href="admin.html" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Adicionar Primeira Homenagem
+                </a>
+            </div>
+
+            <!-- Tribute Card -->
+            <div id="tributeCard" class="tribute-card" style="display: none;">
+                <div class="tribute-content">
+                    <div class="tribute-message">
+                        <p id="messageText">Mensagem da homenagem</p>
+                    </div>
+                    
+                    <div id="imageContainer" class="image-container" style="display: none;">
+                        <img id="tributeImage" src="" alt="Imagem da homenagem" class="tribute-image">
+                    </div>
+                    
+                    <div class="tribute-author">
+                        <span class="author-label">De:</span>
+                        <span class="author-name">Nome do autor</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Controls -->
+            <div class="navigation-controls">
+                <button class="nav-btn" onclick="previousTribute()" id="prevBtn">
+                    <i class="fas fa-chevron-left"></i>
+                    Anterior
+                </button>
+                
+                <div class="counter">
+                    <span id="currentIndex">1</span> / <span id="totalCount">0</span>
+                </div>
+                
+                <button class="nav-btn" onclick="nextTribute()" id="nextBtn">
+                    Próxima
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- Admin Link -->
+            <div class="admin-link">
+                <a href="admin.html" class="btn btn-secondary">
+                    <i class="fas fa-cog"></i>
+                    Administração
+                </a>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 Homenagens 7º Ano - Feito com <i class="fas fa-heart"></i></p>
+        </footer>
+    </div>
+
+    <script src="static/js/main.js"></script>
+</body>
+</html>
